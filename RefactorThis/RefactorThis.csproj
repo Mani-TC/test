@@ -145,6 +145,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Models\ProductOption.cs" />
+    <Compile Include="Repository\Adapters\OptionRepository.cs" />
+    <Compile Include="Repository\Adapters\ProductRepository.cs" />
     <Compile Include="Repository\IOptionsRepository.cs" />
     <Compile Include="Controllers\OptionsController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
@@ -157,6 +159,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\Adapters\Repository.cs" />
     <Compile Include="Repository\IProductRepository.cs" />
+    <Compile Include="Repository\IRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

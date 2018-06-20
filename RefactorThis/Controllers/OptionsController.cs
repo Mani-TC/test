@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using refactor_me.Repository.Adapters;
 
 namespace refactor_me.Controllers
 {
@@ -17,7 +18,7 @@ namespace refactor_me.Controllers
 
         public OptionsController()
         {
-            _repository = new Repository();
+            _repository = new OptionRepository();
         }
 
         public OptionsController(IOptionsRepository repository)

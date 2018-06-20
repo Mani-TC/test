@@ -5,6 +5,8 @@ using refactor_this.Models;
 using refactor_this.Repository;
 using System.Collections.Generic;
 using System.Linq;
+using refactor_me.Repository;
+using refactor_me.Repository.Adapters;
 
 namespace refactor_this.Controllers
 {
@@ -15,7 +17,7 @@ namespace refactor_this.Controllers
 
         public ProductsController()
         {
-            _repository = new refactor_this.Repository.Adapters.Repository();
+            _repository = new ProductRepository();
         }
         public ProductsController(IProductRepository repository)
         {
@@ -39,7 +41,8 @@ namespace refactor_this.Controllers
         [HttpGet]
         public IHttpActionResult Get()
         {
-            return Ok(_repository.All().ToList());
+            //return Ok(_repository.All().ToList());
+            return Ok(_repository.All());
         }
 
         [Route("")]

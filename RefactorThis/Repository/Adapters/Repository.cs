@@ -7,11 +7,13 @@ using System.Web;
 using refactor_this.Models;
 using Dapper;
 using refactor_me.Models;
+using refactor_me.Repository;
 
 namespace refactor_this.Repository.Adapters
 {
     //TODO: use dispose
-    public class Repository : IProductRepository, IOptionsRepository
+    public class Repository<T> : IRepository<T>, IProductRepository, IOptionsRepository
+        where T:class 
     {
         private readonly SqlConnection _connection;
         private DataContext _db;
@@ -59,6 +61,22 @@ namespace refactor_this.Repository.Adapters
         IQueryable<ProductOption> IOptionsRepository.All()
         {
             return _connection.Query<ProductOption>("SELECT * FROM ProductOption").AsQueryable();
+        }
+
+        IEnumerable<T> IRepository<T>.All()
+        {
+            var query = $"SELECT * FROM {typeof(T).Name} ";
+
+            using (var connection = new SqlConnection(""))
+            {
+                connection.Open();
+                return connection.Query<T>(query);
+            }
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
         }
     }
 }
