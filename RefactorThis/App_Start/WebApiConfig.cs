@@ -1,4 +1,6 @@
-﻿using System.Web.Http;
+﻿using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Routing;
 
 namespace refactor_this
 {
@@ -17,7 +19,8 @@ namespace refactor_this
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                defaults: new { id = RouteParameter.Optional },
+                constraints: new { httpMethod= new HttpMethodConstraint(HttpMethod.Get)}
             );
         }
     }

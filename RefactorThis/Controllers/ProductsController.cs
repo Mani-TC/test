@@ -2,36 +2,59 @@
 using System.Net;
 using System.Web.Http;
 using refactor_this.Models;
+using refactor_this.Repository;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace refactor_this.Controllers
 {
-    [RoutePrefix("products")]
+    [RoutePrefix("api/products")]
     public class ProductsController : ApiController
     {
-        [Route]
-        [HttpGet]
-        public Products GetAll()
-        {
-            return new Products();
-        }
+        private readonly IProductRepository _repository;
 
-        [Route]
-        [HttpGet]
-        public Products SearchByName(string name)
+        public ProductsController()
         {
-            return new Products(name);
+            _repository = new refactor_this.Repository.Adapters.Repository();
+        }
+        public ProductsController(IProductRepository repository)
+        {
+            _repository = repository;
         }
 
         [Route("{id}")]
         [HttpGet]
-        public Product GetProduct(Guid id)
+        public IHttpActionResult Get(Guid id)
         {
-            var product = new Product(id);
-            if (product.IsNew)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+            var product = _repository.Find(id);
 
-            return product;
+            if (product != null)
+                return Ok(product);
+
+            return NotFound();
+
         }
+
+        [Route("")]
+        [HttpGet]
+        public IHttpActionResult Get()
+        {
+            return Ok(_repository.All().ToList());
+        }
+
+        [Route("")]
+        [HttpGet]
+        public IHttpActionResult Get(string name)
+        {
+            var list = _repository.Find(name);
+
+            if(list.Any())
+                return Ok(list);
+
+            return NotFound();
+        }
+
+
 
         [Route]
         [HttpPost]
@@ -64,52 +87,6 @@ namespace refactor_this.Controllers
             product.Delete();
         }
 
-        [Route("{productId}/options")]
-        [HttpGet]
-        public ProductOptions GetOptions(Guid productId)
-        {
-            return new ProductOptions(productId);
-        }
-
-        [Route("{productId}/options/{id}")]
-        [HttpGet]
-        public ProductOption GetOption(Guid productId, Guid id)
-        {
-            var option = new ProductOption(id);
-            if (option.IsNew)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-
-            return option;
-        }
-
-        [Route("{productId}/options")]
-        [HttpPost]
-        public void CreateOption(Guid productId, ProductOption option)
-        {
-            option.ProductId = productId;
-            option.Save();
-        }
-
-        [Route("{productId}/options/{id}")]
-        [HttpPut]
-        public void UpdateOption(Guid id, ProductOption option)
-        {
-            var orig = new ProductOption(id)
-            {
-                Name = option.Name,
-                Description = option.Description
-            };
-
-            if (!orig.IsNew)
-                orig.Save();
-        }
-
-        [Route("{productId}/options/{id}")]
-        [HttpDelete]
-        public void DeleteOption(Guid id)
-        {
-            var opt = new ProductOption(id);
-            opt.Delete();
-        }
+        
     }
 }
