@@ -41,7 +41,6 @@ namespace refactor_this.Controllers
         [HttpGet]
         public IHttpActionResult Get()
         {
-            //return Ok(_repository.All().ToList());
             return Ok(_repository.All());
         }
 
@@ -61,33 +60,45 @@ namespace refactor_this.Controllers
 
         [Route]
         [HttpPost]
-        public void Create(Product product)
+        public IHttpActionResult Create(Product product)
         {
-            product.Save();
+            _repository.Insert(product);
+
+            if (product != null)
+            {
+                return Created<Product>(Request.RequestUri + "/"+ product.Id.ToString(), product);
+            }
+
+            return Conflict();
         }
 
         [Route("{id}")]
         [HttpPut]
-        public void Update(Guid id, Product product)
+        public IHttpActionResult Update(Guid id, Product product)
         {
-            var orig = new Product(id)
-            {
-                Name = product.Name,
-                Description = product.Description,
-                Price = product.Price,
-                DeliveryPrice = product.DeliveryPrice
-            };
+            var entity = _repository.Find(id);
 
-            if (!orig.IsNew)
-                orig.Save();
-        }
+            if (entity == null)
+            {
+                return Conflict();
+            }
+
+            entity.Change(product);
+            _repository.Update(id, entity);
+            return Ok(new {Message="Updated", Data = entity});
+ }
 
         [Route("{id}")]
         [HttpDelete]
-        public void Delete(Guid id)
+        public IHttpActionResult Delete(Guid id)
         {
-            var product = new Product(id);
-            product.Delete();
+            var entity = _repository.Find(id);
+
+            if (entity == null)
+                return Conflict();
+
+            _repository.Delete(id);
+            return Ok(new {Message = "Deleted", Data = id});
         }
 
         

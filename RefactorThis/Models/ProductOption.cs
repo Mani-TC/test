@@ -8,10 +8,8 @@ using System.Web;
 
 namespace refactor_me.Models
 {
-    public class ProductOption
+    public class ProductOption:Entity<Guid>
     {
-        public Guid Id { get; set; }
-
         public Guid ProductId { get; set; }
 
         public string Name { get; set; }
@@ -62,6 +60,11 @@ namespace refactor_me.Models
             conn.Open();
             var cmd = new SqlCommand($"delete from productoption where id = '{Id}'", conn);
             cmd.ExecuteReader();
+        }
+
+        public override void Change(Entity<Guid> target)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -118,6 +118,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\Database.mdf" />
+    <Content Include="App_Data\DatabaseOld.mdf" />
+    <Content Include="App_Data\DatabaseOld_log.ldf">
+      <DependentUpon>DatabaseOld.mdf</DependentUpon>
+    </Content>
     <Content Include="App_Data\Database_log.ldf">
       <DependentUpon>Database.mdf</DependentUpon>
     </Content>
@@ -144,6 +148,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\ProductOption.cs" />
     <Compile Include="Repository\Adapters\OptionRepository.cs" />
     <Compile Include="Repository\Adapters\ProductRepository.cs" />

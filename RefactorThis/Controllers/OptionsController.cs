@@ -38,18 +38,18 @@ namespace refactor_me.Controllers
             return NotFound();
             //return new ProductOptions(productId);
         }
-        /*
-        [Route("{productId}/options/{id}")]
+        
+        [Route("options/{id}")]
         [HttpGet]
-        public ProductOption GetOption(Guid productId, Guid id)
+        public IHttpActionResult GetOption(Guid productId, Guid id)
         {
-            var option = new ProductOption(id);
-            if (option.IsNew)
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+            var option = _repository.Find(id);
+            if (option !=null)
+                return Ok(option);
 
-            return option;
+            return NotFound();
         }
-
+        /*
         [Route("{productId}/options")]
         [HttpPost]
         public void CreateOption(Guid productId, ProductOption option)

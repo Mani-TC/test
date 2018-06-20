@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿/*
+
+ */
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Linq.Mapping;
@@ -8,10 +11,10 @@ using System.Web;
 
 namespace refactor_this.Models
 {
+
     [Table(Name = "Product")]
-    public class Product
+    public class Product : Entity<Guid>
     {
-        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
@@ -21,18 +24,17 @@ namespace refactor_this.Models
 
         public decimal DeliveryPrice { get; set; }
 
-        [JsonIgnore]
-        public bool IsNew { get; }
+        //[JsonIgnore]
+        //public bool IsNew { get; }
 
         public Product()
         {
-            Id = Guid.NewGuid();
-            IsNew = true;
+            //IsNew = true;
         }
 
         public Product(Guid id)
         {
-            IsNew = true;
+            //IsNew = true;
             var conn = Helpers.NewConnection();
             var cmd = new SqlCommand($"select * from product where id = '{id}'", conn);
             conn.Open();
@@ -41,7 +43,7 @@ namespace refactor_this.Models
             if (!rdr.Read())
                 return;
 
-            IsNew = false;
+            //IsNew = false;
             Id = Guid.Parse(rdr["Id"].ToString());
             Name = rdr["Name"].ToString();
             Description = (DBNull.Value == rdr["Description"]) ? null : rdr["Description"].ToString();
@@ -51,13 +53,13 @@ namespace refactor_this.Models
 
         public void Save()
         {
-            var conn = Helpers.NewConnection();
-            var cmd = IsNew ?
-                new SqlCommand($"insert into product (id, name, description, price, deliveryprice) values ('{Id}', '{Name}', '{Description}', {Price}, {DeliveryPrice})", conn) :
-                new SqlCommand($"update product set name = '{Name}', description = '{Description}', price = {Price}, deliveryprice = {DeliveryPrice} where id = '{Id}'", conn);
+            //var conn = Helpers.NewConnection();
+            //var cmd = IsNew ?
+            //    new SqlCommand($"insert into product (id, name, description, price, deliveryprice) values ('{Id}', '{Name}', '{Description}', {Price}, {DeliveryPrice})", conn) :
+            //    new SqlCommand($"update product set name = '{Name}', description = '{Description}', price = {Price}, deliveryprice = {DeliveryPrice} where id = '{Id}'", conn);
 
-            conn.Open();
-            cmd.ExecuteNonQuery();
+            //conn.Open();
+            //cmd.ExecuteNonQuery();
         }
 
         public void Delete()
@@ -70,5 +72,16 @@ namespace refactor_this.Models
             var cmd = new SqlCommand($"delete from product where id = '{Id}'", conn);
             cmd.ExecuteNonQuery();
         }
+
+        //TODO: Protect the properties and use methods to Apply Business logic to protect invariants
+        public override void Change(Entity<Guid> entity)
+        {
+            var source = (Product) entity;
+            this.DeliveryPrice = source.DeliveryPrice;
+            this.Description = source.Description;
+            this.Name = source.Name;
+            this.Price = source.Price;
+        }
+
     }
 }

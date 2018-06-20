@@ -5,12 +5,20 @@ namespace refactor_this.Models
 {
     public class Helpers
     {
-        private const string ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename={DataDirectory}\Database.mdf;Integrated Security=True";
+        private const string ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename={DataDirectory}\DatabaseOld.mdf;Integrated Security=True";
 
         public static SqlConnection NewConnection()
         {
             var connstr = ConnectionString.Replace("{DataDirectory}", HttpContext.Current.Server.MapPath("~/App_Data"));
             return new SqlConnection(connstr);
+        }
+
+        public static string DbConnectionString
+        {
+            get
+            {
+                return ConnectionString.Replace("{DataDirectory}", HttpContext.Current.Server.MapPath("~/App_Data"));
+            }
         }
     }
 }

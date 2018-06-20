@@ -3,71 +3,96 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Data.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using refactor_this.Models;
 using Dapper;
 using refactor_me.Models;
 using refactor_me.Repository;
+using System.Reflection;
 
 namespace refactor_this.Repository.Adapters
 {
     //TODO: use dispose
-    public class Repository<T> : IRepository<T>, IProductRepository, IOptionsRepository
-        where T:class 
+    public abstract class Repository<T> : IRepository<T>
+        where T:Entity<Guid>
     {
-        private readonly SqlConnection _connection;
         private DataContext _db;
 
-        public Repository()
+        protected Repository()
         {
-            _connection = Helpers.NewConnection();
-            _db = new DataContext(_connection);
         }
 
-        public IQueryable<Product> All()
+        public T Find(Guid id)
         {
-            var productsTable = _connection.Query<Product>("SELECT * FROM Product");
+            var query = $"SELECT * FROM {typeof(T).Name} WHERE Id=@id";
 
-            return productsTable.AsQueryable();
+            using (var connection = new SqlConnection(Helpers.DbConnectionString))
+            {
+                connection.Open();
+                return connection.QuerySingle<T>(query, new{id});
+            }
         }
 
-        public void Delete(Guid id)
+        public IEnumerable<T> Find(string name)
         {
-            throw new NotImplementedException();
+            var query = $"SELECT * FROM {typeof(T).Name} WHERE name like @p";
+
+            using (var connection = new SqlConnection(Helpers.DbConnectionString))
+            {
+                connection.Open();
+                return connection.Query<T>(query, new { p = "%" + name + "%" });
+            }
         }
 
-        public Product Find(Guid id)
+        public virtual Task Insert(T entity)
         {
-            return this.All().Single(p => p.Id == id);
+            entity.Id = Guid.NewGuid();
+            var columns = GetColumns();
+            var stringOfColumns = string.Join(", ", columns);
+            var stringOfParameters = string.Join(", ", columns.Select(e => "@" + e));
+            var query = $"insert into {typeof(T).Name} ({stringOfColumns}) values ({stringOfParameters})";
+
+            using (var connection = new SqlConnection(Helpers.DbConnectionString))
+            {
+                connection.Open();
+                connection.Execute(query, entity);
+            }
+            return Task.FromResult(0);
         }
 
-        public IQueryable<Product> Find(string name)
+        public Task Update(Guid id, T entity)
         {
+            var columns = GetColumns();
+            var stringOfColumns = string.Join(", ", columns.Select(e => $"{e} = @{e}"));
+            var query = $"update {typeof(T).Name} set {stringOfColumns} where Id = @Id";
 
-            return _connection.Query<Product>("SELECT * FROM Product WHERE name like @p", new { p = "%"+name+"%" })
-                .AsQueryable();
+            using (var connection = new SqlConnection(Helpers.DbConnectionString))
+            {
+                connection.Open();
+                connection.Execute(query, entity);
+            }
+            return Task.FromResult(0);
         }
 
-        public void Insert(Product newProduct)
+        public Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            var query = $"delete from {typeof(T).Name} where Id = @Id";
+
+            using (var connection = new SqlConnection(Helpers.DbConnectionString))
+            {
+                connection.Open();
+                connection.Execute(query, new{id});
+            }
+            return Task.FromResult(0);
         }
 
-        public void Update(Product product)
-        {
-            throw new NotImplementedException();
-        }
-
-        IQueryable<ProductOption> IOptionsRepository.All()
-        {
-            return _connection.Query<ProductOption>("SELECT * FROM ProductOption").AsQueryable();
-        }
 
         IEnumerable<T> IRepository<T>.All()
         {
             var query = $"SELECT * FROM {typeof(T).Name} ";
 
-            using (var connection = new SqlConnection(""))
+            using (var connection = new SqlConnection(Helpers.DbConnectionString))
             {
                 connection.Open();
                 return connection.Query<T>(query);
@@ -77,6 +102,14 @@ namespace refactor_this.Repository.Adapters
         public void Dispose()
         {
             throw new NotImplementedException();
+        }
+
+        private IEnumerable<string> GetColumns()
+        {
+            return typeof(T)
+                .GetProperties()
+                .Where(e =>!e.PropertyType.GetTypeInfo().IsGenericType)
+                .Select(e => e.Name);
         }
     }
 }
