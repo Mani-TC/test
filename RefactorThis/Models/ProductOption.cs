@@ -16,15 +16,13 @@ namespace refactor_me.Models
 
         public string Description { get; set; }
 
-        [JsonIgnore]
-        public bool IsNew { get; }
 
         public ProductOption()
         {
-            Id = Guid.NewGuid();
-            IsNew = true;
+
         }
 
+        /*
         public ProductOption(Guid id)
         {
             IsNew = true;
@@ -61,10 +59,13 @@ namespace refactor_me.Models
             var cmd = new SqlCommand($"delete from productoption where id = '{Id}'", conn);
             cmd.ExecuteReader();
         }
+        */
 
-        public override void Change(Entity<Guid> target)
+        public override void Change(Entity<Guid> entity)
         {
-            throw new NotImplementedException();
+            var source = (ProductOption) entity;
+            this.Name = source.Name;
+            this.Description = source.Description;
         }
     }
 }

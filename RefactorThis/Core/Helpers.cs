@@ -5,7 +5,7 @@ namespace refactor_this.Models
 {
     public class Helpers
     {
-        private const string ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename={DataDirectory}\DatabaseOld.mdf;Integrated Security=True";
+        private const string ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename={DataDirectory}\Database.mdf;Integrated Security=True";
 
         public static SqlConnection NewConnection()
         {

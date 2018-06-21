@@ -6,5 +6,6 @@ namespace refactor_this.Repository
 {
     public interface IOptionsRepository:IRepository<ProductOption>
     {
+        //specific implementations shall be done here
     }
 }

@@ -32,7 +32,9 @@ namespace refactor_this.Models
             //IsNew = true;
         }
 
-        public Product(Guid id)
+        #region obsolete
+        [Obsolete]
+        Product(Guid id)
         {
             //IsNew = true;
             var conn = Helpers.NewConnection();
@@ -51,7 +53,8 @@ namespace refactor_this.Models
             DeliveryPrice = decimal.Parse(rdr["DeliveryPrice"].ToString());
         }
 
-        public void Save()
+        [Obsolete]
+        void Save()
         {
             //var conn = Helpers.NewConnection();
             //var cmd = IsNew ?
@@ -62,16 +65,18 @@ namespace refactor_this.Models
             //cmd.ExecuteNonQuery();
         }
 
-        public void Delete()
+        [Obsolete]
+        void Delete()
         {
-            foreach (var option in new ProductOptions(Id).Items)
-                option.Delete();
+            //foreach (var option in new ProductOptions(Id).Items)
+            //    option.Delete();
 
-            var conn = Helpers.NewConnection();
-            conn.Open();
-            var cmd = new SqlCommand($"delete from product where id = '{Id}'", conn);
-            cmd.ExecuteNonQuery();
+            //var conn = Helpers.NewConnection();
+            //conn.Open();
+            //var cmd = new SqlCommand($"delete from product where id = '{Id}'", conn);
+            //cmd.ExecuteNonQuery();
         }
+#endregion
 
         //TODO: Protect the properties and use methods to Apply Business logic to protect invariants
         public override void Change(Entity<Guid> entity)

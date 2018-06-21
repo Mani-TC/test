@@ -17,8 +17,6 @@ namespace refactor_this.Repository.Adapters
     public abstract class Repository<T> : IRepository<T>
         where T:Entity<Guid>
     {
-        private DataContext _db;
-
         protected Repository()
         {
         }
